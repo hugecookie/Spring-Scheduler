@@ -3,7 +3,7 @@
 
 # 🗓️ Spring Scheduler - 일정 관리 시스템
 
-## ☞ 프로젝트 소개
+## 프로젝트 소개
 Spring Boot 기반의 일정 관리 시스템으로, 사용자가 일정을 생성, 수정, 삭제하고 알림을 설정할 수 있습니다.
 
 ---
@@ -11,6 +11,26 @@ Spring Boot 기반의 일정 관리 시스템으로, 사용자가 일정을 생�
 ## ERD 구조  
 **아래는 DB 구조를 나타내는 ERD(Entity Relationship Diagram)입니다.**  
 ![ERD](src/img/DBdiagram.png)
+
+### **테이블 설명**
+| 테이블명 | 설명 |
+|---------|-------------------------|
+| **schedules** | 기본 일정 정보를 저장하는 테이블 |
+| **schedule_history** | 일정이 수정될 때마다 변경 내역을 저장하는 테이블 |
+| **schedule_participants** | 일정에 참여하는 사용자 정보를 저장하는 테이블 |
+| **schedule_notifications** | 일정에 대한 알림 정보를 저장하는 테이블 |
+
+---
+
+### **테이블 간 관계**
+1. **`schedules(일정)` ↔ `schedule_history(일정 수정 이력)`** (`1:N`)
+- 일정이 수정될 때마다, `schedule_history`에 이전 데이터가 기록됨.
+
+2. **`schedules(일정)` ↔ `schedule_participants(참여자)`** (`1:N`)
+- 하나의 일정에는 여러 명의 사용자가 참여할 수 있음.
+
+3. **`schedules(일정)` ↔ `schedule_notifications(알림)`** (`1:N`)
+- 하나의 일정에는 여러 개의 알림이 설정될 수 있음.
 
 ---
 
