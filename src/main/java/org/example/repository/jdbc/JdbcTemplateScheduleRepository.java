@@ -1,0 +1,69 @@
+package org.example.repository.jdbc;
+
+import org.example.entity.Schedule;
+import org.example.repository.ScheduleRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public class JdbcTemplateScheduleRepository implements ScheduleRepository {
+    private final JdbcTemplate jdbcTemplate;
+
+    public JdbcTemplateScheduleRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public Schedule save(Schedule schedule) {
+        String sql = "INSERT INTO schedules (title, description, date, time, password, status, created_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        jdbcTemplate.update(sql,
+                schedule.getTitle(),
+                schedule.getDescription(),
+                schedule.getDate(),
+                schedule.getTime(),
+                schedule.getPassword(),
+                schedule.getStatus()
+        );
+
+        Long generatedId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        schedule.setId(generatedId);
+        return schedule;
+    }
+
+    @Override
+    public Optional<Schedule> findById(Long id) {
+        String sql = "SELECT * FROM schedules WHERE id = ?";
+        List<Schedule> schedules = jdbcTemplate.query(sql, new ScheduleRowMapper(), id);
+        return schedules.stream().findFirst();
+    }
+
+    @Override
+    public List<Schedule> findAll() {
+        String sql = "SELECT * FROM schedules";
+        return jdbcTemplate.query(sql, new ScheduleRowMapper());
+    }
+
+    private static class ScheduleRowMapper implements RowMapper<Schedule> {
+        @Override
+        public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new Schedule(
+                    rs.getLong("id"),
+                    rs.getString("title"),
+                    rs.getString("description"),
+                    rs.getDate("date").toLocalDate(),
+                    rs.getTime("time").toLocalTime(),
+                    rs.getString("password"),
+                    rs.getString("status"),
+                    rs.getTimestamp("created_at").toLocalDateTime(),
+                    rs.getTimestamp("last_updated_at") != null ? rs.getTimestamp("last_updated_at").toLocalDateTime() : null
+            );
+        }
+    }
+}
