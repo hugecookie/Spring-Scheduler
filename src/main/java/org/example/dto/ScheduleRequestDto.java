@@ -3,14 +3,12 @@ package org.example.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 // ✅ 일정 생성/수정 요청 DTO
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleRequestDto {
