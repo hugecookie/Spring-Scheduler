@@ -19,7 +19,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
     // MySQL 드라이버
-    implementation 'mysql:mysql-connector-java'
+//    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'com.mysql:mysql-connector-j'
 
     // Lombok (코드 간소화)
     compileOnly 'org.projectlombok:lombok'
