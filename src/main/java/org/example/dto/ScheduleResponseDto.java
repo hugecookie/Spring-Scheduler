@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 
-// 일정 조회 응답 DTO
+// ✅ 일정 조회 응답 DTO
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +18,7 @@ public class ScheduleResponseDto {
     private Long id; // 일정 ID
     private String title; // 일정 제목
     private String description; // 일정 설명
+    private String author; // 작성자 명
     private LocalDate date; // 일정 날짜
     private LocalTime time; // 일정 시간
     private String status; // 일정 상태 (scheduled, ongoing, completed, canceled)
