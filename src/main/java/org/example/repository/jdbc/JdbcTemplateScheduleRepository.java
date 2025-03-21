@@ -55,6 +55,42 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
         return jdbcTemplate.query(sql, new ScheduleRowMapper());
     }
 
+    @Override
+    public Schedule update(Schedule schedule) {
+        String sql = "UPDATE schedules " +
+                "SET title = ?, author = ?, last_updated_at = NOW() " +
+                "WHERE id = ?";
+
+        int rows = jdbcTemplate.update(sql,
+                schedule.getTitle(),
+                schedule.getAuthor(),
+                schedule.getId()
+        );
+
+        if (rows == 0) {
+            throw new IllegalStateException("일정 수정 실패");
+        }
+
+        return findById(schedule.getId())
+                .orElseThrow(() -> new IllegalStateException("수정 후 일정 조회 실패"));
+    }
+
+    @Override
+    public Schedule delete(Schedule schedule) {
+        String sql = "DELETE FROM schedules WHERE id = ?";
+        jdbcTemplate.update(sql, schedule.getId());
+        return schedule; // 또는 삭제 전 데이터를 조회해서 반환해도 OK
+    }
+
+
+
+    @Override
+    public boolean validatePassword(Long id, String password) {
+        String sql = "SELECT COUNT(*) FROM schedules WHERE id = ? AND password = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id, password);
+        return count > 0;
+    }
+
     // ✅ Schedule 엔티티를 매핑하는 RowMapper
     private static class ScheduleRowMapper implements RowMapper<Schedule> {
         @Override
