@@ -10,7 +10,6 @@ import java.time.LocalTime;
 // ✅ 일정 생성/수정 요청 DTO
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ScheduleRequestDto {
     private String title; // 일정 제목
     private String description; // 일정 설명 (선택 사항)

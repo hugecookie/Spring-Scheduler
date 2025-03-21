@@ -70,10 +70,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         // ✅ 정상 수정 로직
-        Schedule schedule = new Schedule();
-        schedule.setId(id);
-        schedule.setTitle(requestDto.getTitle());
-        schedule.setAuthor(requestDto.getAuthor());
+        Schedule schedule = new Schedule(id, requestDto.getTitle(), requestDto.getAuthor());
 
         Schedule updated = scheduleRepository.update(schedule);
         return convertToResponseDto(updated);
@@ -99,6 +96,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     // ✅ Schedule 엔티티를 ScheduleResponseDto로 변환
     private ScheduleResponseDto convertToResponseDto(Schedule schedule) {
         return new ScheduleResponseDto(
+                schedule.getId(),
                 schedule.getTitle(),
                 schedule.getDescription(),
                 schedule.getAuthor(),
