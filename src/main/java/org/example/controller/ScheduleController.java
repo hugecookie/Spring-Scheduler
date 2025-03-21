@@ -1,7 +1,9 @@
 package org.example.controller;
 
+import org.example.dto.ScheduleDeleteRequestDto;
 import org.example.dto.ScheduleRequestDto;
 import org.example.dto.ScheduleResponseDto;
+import org.example.dto.ScheduleUpdateRequestDto;
 import org.example.service.ScheduleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +40,25 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleResponseDto>> getAllSchedules() {
         List<ScheduleResponseDto> schedules = scheduleService.getAllSchedules();
         return ResponseEntity.ok(schedules);
+    }
+
+    // ✅ 일정 수정: PUT /schedules/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(
+            @PathVariable Long id,
+            @RequestBody ScheduleUpdateRequestDto requestDto) {
+
+        ScheduleResponseDto updatedSchedule = scheduleService.updateSchedule(id, requestDto);
+        return ResponseEntity.ok(updatedSchedule);
+    }
+
+    // ✅ 일정 삭제: DELETE /schedules/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ScheduleResponseDto> deleteSchedule(
+            @PathVariable Long id,
+            @RequestBody ScheduleDeleteRequestDto requestDto) {
+
+        ScheduleResponseDto deletedSchedule = scheduleService.deleteSchedule(id, requestDto);
+        return ResponseEntity.ok(deletedSchedule);
     }
 }
