@@ -60,12 +60,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto requestDto) {
-        // ✅ 존재하지 않는 일정이면 404 응답
+        // ✅ 해당 일정 존재 여부
         if (!scheduleRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다.");
         }
 
-        // ✅ 비밀번호 틀리면 403 응답
+        // ✅ 비밀번호 검증
         if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
         }
@@ -80,12 +80,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDto deleteSchedule(Long id, ScheduleDeleteRequestDto requestDto) {
-        // ✅ 비밀번호 틀리면 403 응답
+        // ✅ 비밀번호 검증
         if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
         }
 
-        // ✅ 일정 조회 (심볼 오류 해결)
+        // ✅ 해당 일정 존재 여부 검증 후 schedule 생성
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
 
