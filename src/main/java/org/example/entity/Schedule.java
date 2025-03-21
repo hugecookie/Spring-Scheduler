@@ -20,7 +20,7 @@ public class Schedule {
     private LocalDate date; // 일정 날짜
     private LocalTime time; // 일정 시간
     private String password; // 일정 비밀번호 (DB 저장, 응답에서는 제외)
-    private String status; // 일정 상태 (scheduled, ongoing, completed, canceled)
+    private ScheduleStatus status; // 일정 상태 (scheduled, ongoing, completed, canceled)
     private LocalDateTime createdAt; // 생성 날짜
     private LocalDateTime lastUpdatedAt; // 마지막 수정 날짜
 
@@ -33,7 +33,7 @@ public class Schedule {
 
     public Schedule(Long id, String title, String description, String author,
                     LocalDate date, LocalTime time, String password,
-                    String status, LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
+                    ScheduleStatus status, LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
         this.id = id;
         this.title = title;
         this.description = description;

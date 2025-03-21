@@ -5,6 +5,7 @@ import org.example.dto.ScheduleRequestDto;
 import org.example.dto.ScheduleResponseDto;
 import org.example.dto.ScheduleUpdateRequestDto;
 import org.example.entity.Schedule;
+import org.example.entity.ScheduleStatus;
 import org.example.repository.ScheduleRepository;
 import org.example.service.ScheduleService;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 requestDto.getDate(),
                 requestDto.getTime(),
                 requestDto.getPassword(),
-                "scheduled",
+                ScheduleStatus.SCHEDULED,
                 LocalDateTime.now(),
                 null
         );
@@ -102,7 +103,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 schedule.getAuthor(),
                 schedule.getDate(),
                 schedule.getTime(),
-                schedule.getStatus(),
+                schedule.getStatus().toString(),
                 schedule.getCreatedAt(),
                 schedule.getLastUpdatedAt()
         );

@@ -1,6 +1,7 @@
 package org.example.repository.jdbc;
 
 import org.example.entity.Schedule;
+import org.example.entity.ScheduleStatus;
 import org.example.repository.ScheduleRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,7 +32,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
                 schedule.getDate(),
                 schedule.getTime(),
                 schedule.getPassword(),
-                schedule.getStatus()
+                schedule.getStatus().toString()
         );
 
         // ✅ 생성된 ID 조회
@@ -111,7 +112,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
                     rs.getDate("date").toLocalDate(),
                     rs.getTime("time").toLocalTime(),
                     rs.getString("password"),
-                    rs.getString("status"),
+                    ScheduleStatus.from(rs.getString("status")),
                     rs.getTimestamp("created_at").toLocalDateTime(),
                     rs.getTimestamp("last_updated_at") != null ? rs.getTimestamp("last_updated_at").toLocalDateTime() : null
             );
