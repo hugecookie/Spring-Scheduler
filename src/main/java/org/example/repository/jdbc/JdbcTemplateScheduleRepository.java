@@ -55,6 +55,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
         return jdbcTemplate.query(sql, new ScheduleRowMapper());
     }
 
+    // ✅ id 값에 대응하는 일정 변경
     @Override
     public Schedule update(Schedule schedule) {
         String sql = "UPDATE schedules " +
@@ -75,6 +76,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
                 .orElseThrow(() -> new IllegalStateException("수정 후 일정 조회 실패"));
     }
 
+    // ✅ id 값에 대응하는 일정 삭제
     @Override
     public Schedule delete(Schedule schedule) {
         String sql = "DELETE FROM schedules WHERE id = ?";
@@ -82,8 +84,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
         return schedule; // 또는 삭제 전 데이터를 조회해서 반환해도 OK
     }
 
-
-
+    // ✅ 비밀번호 검증 메서드
     @Override
     public boolean validatePassword(Long id, String password) {
         String sql = "SELECT COUNT(*) FROM schedules WHERE id = ? AND password = ?";
