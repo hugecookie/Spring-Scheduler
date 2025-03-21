@@ -99,10 +99,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     // ✅ Schedule 엔티티를 ScheduleResponseDto로 변환
     private ScheduleResponseDto convertToResponseDto(Schedule schedule) {
         return new ScheduleResponseDto(
-                schedule.getId(),
-                schedule.getAuthor(),
                 schedule.getTitle(),
                 schedule.getDescription(),
+                schedule.getAuthor(),
                 schedule.getDate(),
                 schedule.getTime(),
                 schedule.getStatus(),
