@@ -1,7 +1,9 @@
 package org.example.service.impl;
 
+import org.example.dto.ScheduleDeleteRequestDto;
 import org.example.dto.ScheduleRequestDto;
 import org.example.dto.ScheduleResponseDto;
+import org.example.dto.ScheduleUpdateRequestDto;
 import org.example.entity.Schedule;
 import org.example.repository.ScheduleRepository;
 import org.example.service.ScheduleService;
@@ -51,6 +53,39 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.findAll().stream()
                 .map(this::convertToResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto requestDto) {
+        // 1. 비밀번호 검증
+        if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀렸거나 해당 일정이 존재하지 않습니다.");
+        }
+
+        // 2. 수정 기능 수행
+        Schedule schedule = new Schedule();
+        schedule.setId(id);
+        schedule.setTitle(requestDto.getTitle());
+        schedule.setAuthor(requestDto.getAuthor());
+
+        Schedule updated = scheduleRepository.update(schedule);
+        return convertToResponseDto(updated);
+    }
+
+    @Override
+    public ScheduleResponseDto deleteSchedule(Long id, ScheduleDeleteRequestDto requestDto) {
+        // 1. 해당 일정 검색
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 존재하지 않습니다."));
+
+        // 2. 비밀번호 검증
+        if (!schedule.getPassword().equals(requestDto.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 삭제 기능 수행
+        Schedule deleted = scheduleRepository.delete(schedule);
+        return convertToResponseDto(deleted);
     }
 
     // ✅ Schedule 엔티티를 ScheduleResponseDto로 변환
