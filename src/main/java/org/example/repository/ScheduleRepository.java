@@ -11,5 +11,6 @@ public interface ScheduleRepository {
     List<Schedule> findAll(); // ✅ 모든 일정 조회
     Schedule update(Schedule schedule); // ✅ 수정 후 해당 일정 반환
     Schedule delete(Schedule schedule); // ✅ 삭제 후 해당 일정 반환
-    boolean validatePassword(Long id, String password); // ✅ 추가
+    boolean validatePassword(Long id, String password); // ✅ 비밀번호 검증 추가
+    boolean existsById(Long id); // ✅ ID 일정 확인
 }

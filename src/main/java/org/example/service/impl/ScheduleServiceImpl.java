@@ -7,7 +7,9 @@ import org.example.dto.ScheduleUpdateRequestDto;
 import org.example.entity.Schedule;
 import org.example.repository.ScheduleRepository;
 import org.example.service.ScheduleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,12 +59,17 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto requestDto) {
-        // ✅ 비밀번호 검증
-        if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 틀렸거나 해당 일정이 존재하지 않습니다.");
+        // ✅ 존재하지 않는 일정이면 404 응답
+        if (!scheduleRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다.");
         }
 
-        // ✅ 수정 기능 수행
+        // ✅ 비밀번호 틀리면 403 응답
+        if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
+        }
+
+        // ✅ 정상 수정 로직
         Schedule schedule = new Schedule();
         schedule.setId(id);
         schedule.setTitle(requestDto.getTitle());
@@ -72,15 +79,16 @@ public class ScheduleServiceImpl implements ScheduleService {
         return convertToResponseDto(updated);
     }
 
+
     @Override
     public ScheduleResponseDto deleteSchedule(Long id, ScheduleDeleteRequestDto requestDto) {
         // ✅ 해당 일정 검색
         Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
 
         // ✅ 비밀번호 검증
         if (!schedule.getPassword().equals(requestDto.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
         }
 
         // ✅ 삭제 기능 수행

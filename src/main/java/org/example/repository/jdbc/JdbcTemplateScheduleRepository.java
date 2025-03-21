@@ -87,9 +87,17 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
     // ✅ 비밀번호 검증 메서드
     @Override
     public boolean validatePassword(Long id, String password) {
-        String sql = "SELECT COUNT(*) FROM schedules WHERE id = ? AND password = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id, password);
-        return count > 0;
+        String sql = "SELECT * FROM schedules WHERE id = ? AND password = ?";
+        List<Schedule> schedules = jdbcTemplate.query(sql, new ScheduleRowMapper(), id, password);
+        return !schedules.isEmpty();
+    }
+
+    // ✅ ID 확인 로직
+    @Override
+    public boolean existsById(Long id) {
+        String sql = "SELECT * FROM schedules WHERE id = ?";
+        List<Schedule> schedules = jdbcTemplate.query(sql, new ScheduleRowMapper(), id);
+        return !schedules.isEmpty();
     }
 
     // ✅ Schedule 엔티티를 매핑하는 RowMapper
