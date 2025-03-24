@@ -47,11 +47,11 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
     @Override
     public Optional<Schedule> findById(Long id) {
         String sql = """
-            SELECT s.*, 
-                   a.id AS author_id, 
-                   a.name AS author_name, 
-                   a.email AS author_email, 
-                   a.created_at AS author_created_at, 
+            SELECT s.*,
+                   a.id AS author_id,
+                   a.name AS author_name,
+                   a.email AS author_email,
+                   a.created_at AS author_created_at,
                    a.updated_at AS author_updated_at
             FROM schedules s
             JOIN authors a ON s.author_id = a.id
@@ -65,11 +65,11 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
     @Override
     public List<Schedule> findAll() {
         String sql = """
-            SELECT s.*, 
-                   a.id AS author_id, 
-                   a.name AS author_name, 
-                   a.email AS author_email, 
-                   a.created_at AS author_created_at, 
+            SELECT s.*,
+                   a.id AS author_id,
+                   a.name AS author_name,
+                   a.email AS author_email,
+                   a.created_at AS author_created_at,
                    a.updated_at AS author_updated_at
             FROM schedules s
             JOIN authors a ON s.author_id = a.id
