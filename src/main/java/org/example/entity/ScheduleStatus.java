@@ -12,11 +12,6 @@ public enum ScheduleStatus {
         this.value = value;
     }
 
-    @Override
-    public String toString() {
-        return value; // ✅ 이제 toString()이 소문자 값 반환!
-    }
-
     public static ScheduleStatus from(String value) {
         for (ScheduleStatus status : values()) {
             if (status.value.equalsIgnoreCase(value)) {
