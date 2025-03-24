@@ -125,6 +125,23 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
         return count > 0;
     }
 
+    @Override
+    public List<Schedule> findAllWithPaging(int offset, int limit) {
+        String sql = """
+        SELECT s.*,
+               a.id AS author_id,
+               a.name AS author_name,
+               a.email AS author_email,
+               a.created_at AS author_created_at,
+               a.updated_at AS author_updated_at
+        FROM schedules s
+        JOIN authors a ON s.author_id = a.id
+        ORDER BY s.created_at DESC
+        LIMIT ? OFFSET ?
+    """;
+        return jdbcTemplate.query(sql, new ScheduleRowMapper(), limit, offset);
+    }
+
     // ✅ Schedule 엔티티를 매핑하는 RowMapper (작성자 연관 포함, 생성자만 사용)
     private static class ScheduleRowMapper implements RowMapper<Schedule> {
         @Override

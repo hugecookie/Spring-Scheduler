@@ -42,6 +42,16 @@ public class ScheduleController {
         return ResponseEntity.ok(schedules);
     }
 
+    // ✅[페이지네이션] GET /paged 10개씩
+    @GetMapping("/paged")
+    public ResponseEntity<List<ScheduleResponseDto>> getSchedulesWithPaging(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        List<ScheduleResponseDto> result = scheduleService.getSchedules(page, size);
+        return ResponseEntity.ok(result);
+    }
+
     // ✅ 일정 수정: PUT /schedules/{id}
     @PutMapping("/{id}")
     public ResponseEntity<ScheduleResponseDto> updateSchedule(

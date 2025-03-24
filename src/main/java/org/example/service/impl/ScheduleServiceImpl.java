@@ -114,6 +114,15 @@ public class ScheduleServiceImpl implements ScheduleService {
         return convertToResponseDto(deleted);
     }
 
+    @Override
+    public List<ScheduleResponseDto> getSchedules(int page, int size) {
+        int offset = page * size;
+        List<Schedule> schedules = scheduleRepository.findAllWithPaging(offset, size);
+        return schedules.stream()
+                .map(this::convertToResponseDto)
+                .collect(Collectors.toList());
+    }
+
     // ✅ Schedule 엔티티를 ScheduleResponseDto로 변환
     private ScheduleResponseDto convertToResponseDto(Schedule schedule) {
         Author author = schedule.getAuthor();
