@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcTemplateScheduleRepository implements ScheduleRepository {
+
     private final JdbcTemplate jdbcTemplate;
 
     public JdbcTemplateScheduleRepository(JdbcTemplate jdbcTemplate) {
@@ -26,6 +27,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
     public Schedule save(Schedule schedule) {
         String sql = "INSERT INTO schedules (title, description, author_id, date, time, password, status, created_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+
         jdbcTemplate.update(sql,
                 schedule.getTitle(),
                 schedule.getDescription(),
