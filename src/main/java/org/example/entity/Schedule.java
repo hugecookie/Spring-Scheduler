@@ -16,7 +16,7 @@ public class Schedule {
     private Long id; // 일정 ID (Primary Key)
     private String title; // 일정 제목
     private String description; // 일정 설명
-    private String author; // 작성자
+    private Author author; // 작성자
     private LocalDate date; // 일정 날짜
     private LocalTime time; // 일정 시간
     private String password; // 일정 비밀번호 (DB 저장, 응답에서는 제외)
@@ -24,14 +24,14 @@ public class Schedule {
     private LocalDateTime createdAt; // 생성 날짜
     private LocalDateTime lastUpdatedAt; // 마지막 수정 날짜
 
-    public Schedule(Long id, String title, String author) {
+    public Schedule(Long id, String title, Author author) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.lastUpdatedAt = LocalDateTime.now();
     }
 
-    public Schedule(Long id, String title, String description, String author,
+    public Schedule(Long id, String title, String description, Author author,
                     LocalDate date, LocalTime time, String password,
                     ScheduleStatus status, LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
         this.id = id;

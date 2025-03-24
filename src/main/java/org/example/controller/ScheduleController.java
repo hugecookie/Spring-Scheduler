@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import org.example.dto.ScheduleDeleteRequestDto;
-import org.example.dto.ScheduleRequestDto;
+import org.example.dto.ScheduleCreateRequestDto;
 import org.example.dto.ScheduleResponseDto;
 import org.example.dto.ScheduleUpdateRequestDto;
 import org.example.service.ScheduleService;
@@ -23,7 +23,7 @@ public class ScheduleController {
 
     // ✅ [일정 생성] POST /schedules
     @PostMapping
-    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleRequestDto requestDto) {
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleCreateRequestDto requestDto) {
         ScheduleResponseDto createdSchedule = scheduleService.createSchedule(requestDto);
         return ResponseEntity.ok(createdSchedule);
     }

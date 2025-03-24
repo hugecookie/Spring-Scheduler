@@ -1,11 +1,10 @@
 package org.example.service.impl;
 
-import org.example.dto.ScheduleDeleteRequestDto;
-import org.example.dto.ScheduleRequestDto;
-import org.example.dto.ScheduleResponseDto;
-import org.example.dto.ScheduleUpdateRequestDto;
+import org.example.dto.*;
+import org.example.entity.Author;
 import org.example.entity.Schedule;
 import org.example.entity.ScheduleStatus;
+import org.example.repository.AuthorRepository;
 import org.example.repository.ScheduleRepository;
 import org.example.service.ScheduleService;
 import org.springframework.http.HttpStatus;
@@ -20,19 +19,28 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final AuthorRepository authorRepository;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository) {
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, AuthorRepository authorRepository) {
         this.scheduleRepository = scheduleRepository;
+        this.authorRepository = authorRepository;
     }
 
     // ✅ [일정 생성] 새로운 일정 저장
     @Override
-    public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto) {
+    public ScheduleResponseDto createSchedule(ScheduleCreateRequestDto requestDto) {
+        AuthorDto authorDto = requestDto.getAuthor();
+
+        Author author = authorRepository.findByEmail(authorDto.getEmail())
+                .orElseGet(() -> authorRepository.save(
+                        new Author(null, authorDto.getName(), authorDto.getEmail(), null, null)
+                ));
+
         Schedule schedule = new Schedule(
-                null, // ID는 자동 생성
+                null,
                 requestDto.getTitle(),
-                requestDto.getAuthor(),
                 requestDto.getDescription(),
+                author,
                 requestDto.getDate(),
                 requestDto.getTime(),
                 requestDto.getPassword(),
@@ -70,13 +78,25 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
         }
 
-        // ✅ 정상 수정 로직
-        Schedule schedule = new Schedule(id, requestDto.getTitle(), requestDto.getAuthor());
+        Schedule existing = scheduleRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+
+        Schedule schedule = new Schedule(
+                id,
+                requestDto.getTitle(),
+                requestDto.getDescription(),
+                existing.getAuthor(),
+                requestDto.getDate(),
+                requestDto.getTime(),
+                existing.getPassword(),
+                existing.getStatus(),
+                existing.getCreatedAt(),
+                LocalDateTime.now()
+        );
 
         Schedule updated = scheduleRepository.update(schedule);
         return convertToResponseDto(updated);
     }
-
 
     @Override
     public ScheduleResponseDto deleteSchedule(Long id, ScheduleDeleteRequestDto requestDto) {
@@ -96,14 +116,16 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     // ✅ Schedule 엔티티를 ScheduleResponseDto로 변환
     private ScheduleResponseDto convertToResponseDto(Schedule schedule) {
+        Author author = schedule.getAuthor();
         return new ScheduleResponseDto(
                 schedule.getId(),
                 schedule.getTitle(),
                 schedule.getDescription(),
-                schedule.getAuthor(),
+                author.getName(),
+                author.getEmail(),
                 schedule.getDate(),
                 schedule.getTime(),
-                schedule.getStatus().toString(),
+                schedule.getStatus().name(),
                 schedule.getCreatedAt(),
                 schedule.getLastUpdatedAt()
         );
