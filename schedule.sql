@@ -2,18 +2,28 @@
 CREATE DATABASE IF NOT EXISTS schedule_db;
 USE schedule_db;
 
+-- 작성자 테이블 (Author)
+CREATE TABLE IF NOT EXISTS authors (
+                                       id INT AUTO_INCREMENT PRIMARY KEY,
+                                       name VARCHAR(100) NOT NULL,
+                                       email VARCHAR(255) NOT NULL UNIQUE,
+                                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- 일정 테이블 (기본 일정 정보 저장)
 CREATE TABLE IF NOT EXISTS schedules (
                                          id INT AUTO_INCREMENT PRIMARY KEY,
                                          title VARCHAR(255) NOT NULL,
                                          description TEXT NULL,
-                                         author VARCHAR(100) NOT NULL,
+                                         author_id INT NOT NULL,
                                          date DATE NOT NULL,
                                          time TIME NOT NULL,
                                          password VARCHAR(255) NOT NULL,
                                          status ENUM('scheduled', 'ongoing', 'completed', 'canceled') NOT NULL DEFAULT 'scheduled',
                                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                                         last_updated_at TIMESTAMP NULL
+                                         last_updated_at TIMESTAMP NULL,
+                                         FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE CASCADE
 );
 
 -- 일정 수정 이력 테이블 (수정할 때마다 기록)
