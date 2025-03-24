@@ -4,6 +4,7 @@ import org.example.dto.ScheduleDeleteRequestDto;
 import org.example.dto.ScheduleCreateRequestDto;
 import org.example.dto.ScheduleResponseDto;
 import org.example.dto.ScheduleUpdateRequestDto;
+import org.example.dto.PagingResponseDto;
 import org.example.service.ScheduleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,11 +45,11 @@ public class ScheduleController {
 
     // ✅[페이지네이션] GET /paged 10개씩
     @GetMapping("/paged")
-    public ResponseEntity<List<ScheduleResponseDto>> getSchedulesWithPaging(
+    public ResponseEntity<PagingResponseDto<ScheduleResponseDto>> getSchedulesWithPaging(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        List<ScheduleResponseDto> result = scheduleService.getSchedules(page, size);
+        PagingResponseDto<ScheduleResponseDto> result = scheduleService.getSchedules(page, size);
         return ResponseEntity.ok(result);
     }
 

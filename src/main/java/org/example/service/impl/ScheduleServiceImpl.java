@@ -115,12 +115,17 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleResponseDto> getSchedules(int page, int size) {
+    public PagingResponseDto<ScheduleResponseDto> getSchedules(int page, int size) {
         int offset = page * size;
         List<Schedule> schedules = scheduleRepository.findAllWithPaging(offset, size);
-        return schedules.stream()
+        List<ScheduleResponseDto> content = schedules.stream()
                 .map(this::convertToResponseDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        long totalElements = scheduleRepository.count();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        return new PagingResponseDto<>(content, page, size, totalPages, totalElements);
     }
 
     // ✅ Schedule 엔티티를 ScheduleResponseDto로 변환

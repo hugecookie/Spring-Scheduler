@@ -14,4 +14,5 @@ public interface ScheduleRepository {
     boolean validatePassword(Long id, String password); // ✅ 비밀번호 검증 추가
     boolean existsById(Long id); // ✅ ID 일정 확인
     List<Schedule> findAllWithPaging(int offset, int limit);
+    long count(); // 전체 일정 개수 반환
 }

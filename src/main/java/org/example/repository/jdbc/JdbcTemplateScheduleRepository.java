@@ -142,6 +142,12 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
         return jdbcTemplate.query(sql, new ScheduleRowMapper(), limit, offset);
     }
 
+    @Override
+    public long count() {
+        String sql = "SELECT COUNT(*) FROM schedules";
+        return jdbcTemplate.queryForObject(sql, Long.class);
+    }
+
     // ✅ Schedule 엔티티를 매핑하는 RowMapper (작성자 연관 포함, 생성자만 사용)
     private static class ScheduleRowMapper implements RowMapper<Schedule> {
         @Override
