@@ -20,6 +20,7 @@ public class JdbcTemplateAuthorRepository implements AuthorRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // ✅ 이메일을 기반으로 작성자 단건 조회
     @Override
     public Optional<Author> findByEmail(String email) {
         String sql = "SELECT * FROM authors WHERE email = ?";
@@ -27,20 +28,21 @@ public class JdbcTemplateAuthorRepository implements AuthorRepository {
         return authors.stream().findFirst();
     }
 
+    // ✅ 작성자 저장 (이름, 이메일만 저장 - created_at, updated_at은 DB default)
     @Override
     public Author save(Author author) {
         String sql = "INSERT INTO authors (name, email) VALUES (?, ?)";
         jdbcTemplate.update(sql, author.getName(), author.getEmail());
 
-        // INSERT 후 id 조회
+        // ✅ INSERT 후 자동 생성된 id 가져오기
         Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
 
-        // 작성자 다시 조회해서 반환 (생성자 방식으로 반환)
+        // ✅ 방금 저장한 작성자 다시 조회해서 반환
         String query = "SELECT * FROM authors WHERE id = ?";
         return jdbcTemplate.queryForObject(query, new AuthorRowMapper(), id);
     }
 
-    // ✅ Author 엔티티를 매핑하는 RowMapper (생성자 방식!)
+    // ✅ Author 엔티티를 매핑하는 RowMapper (생성자 기반 매핑)
     private static class AuthorRowMapper implements RowMapper<Author> {
         @Override
         public Author mapRow(ResultSet rs, int rowNum) throws SQLException {
