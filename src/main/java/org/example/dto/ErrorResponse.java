@@ -2,6 +2,7 @@ package org.example.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.example.entity.ErrorCode;
 
 // ✅ 에러 메세지 Dto
@@ -9,7 +10,10 @@ import org.example.entity.ErrorCode;
 @AllArgsConstructor
 public class ErrorResponse {
     private final String code;
-    private final String message;
+
+    @Setter
+    private String message;
+
     private final int status;
 
     // ErrorCode 기반 생성자
