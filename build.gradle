@@ -18,8 +18,10 @@ dependencies {
     // Spring Boot Starter JDBC (JDBC 사용 필수)
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
+    // 유효성 검사 (Lv6용)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // MySQL 드라이버
-//    implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'com.mysql:mysql-connector-j'
 
     // Lombok (코드 간소화)
