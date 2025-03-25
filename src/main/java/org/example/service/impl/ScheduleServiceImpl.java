@@ -4,6 +4,8 @@ import org.example.dto.*;
 import org.example.entity.Author;
 import org.example.entity.Schedule;
 import org.example.entity.ScheduleStatus;
+import org.example.exception.PasswordMismatchException;
+import org.example.exception.ScheduleNotFoundException;
 import org.example.repository.AuthorRepository;
 import org.example.repository.ScheduleRepository;
 import org.example.service.ScheduleService;
@@ -55,6 +57,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     // ✅ [특정 일정 조회] {id} 값에 맞춰서 해당 일정을 조회
     @Override
     public Optional<ScheduleResponseDto> getScheduleById(Long id) {
+        // ✅ 해당 일정 존재 여부
+        if (!scheduleRepository.existsById(id)) {
+            throw new ScheduleNotFoundException("해당 일정이 존재하지 않습니다.");
+        }
+
         return scheduleRepository.findById(id).map(this::convertToResponseDto);
     }
 
@@ -70,16 +77,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto requestDto) {
         // ✅ 해당 일정 존재 여부
         if (!scheduleRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다.");
+            throw new ScheduleNotFoundException("해당 일정이 존재하지 않습니다.");
         }
 
         // ✅ 비밀번호 검증
         if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }
 
         Schedule existing = scheduleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+                .orElseThrow(() -> new ScheduleNotFoundException("해당 일정이 존재하지 않습니다."));
 
         Schedule schedule = new Schedule(
                 id,
@@ -102,12 +109,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     public ScheduleResponseDto deleteSchedule(Long id, ScheduleDeleteRequestDto requestDto) {
         // ✅ 비밀번호 검증
         if (!scheduleRepository.validatePassword(id, requestDto.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }
 
         // ✅ 해당 일정 존재 여부 검증 후 schedule 생성
         Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 일정이 존재하지 않습니다."));
+                .orElseThrow(() -> new ScheduleNotFoundException("해당 일정이 존재하지 않습니다."));
 
         // ✅ 삭제 기능 수행
         Schedule deleted = scheduleRepository.delete(schedule);
