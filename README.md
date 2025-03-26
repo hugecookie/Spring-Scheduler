@@ -1,220 +1,220 @@
-
----
-
 # 🗓️ Spring Scheduler - 일정 관리 시스템
 
-## 프로젝트 소개
-Spring Boot 기반의 일정 관리 시스템으로, 사용자가 일정을 생성, 수정, 삭제하고 알림을 설정할 수 있습니다.
+## 1. 프로젝트 개요
+
+이 프로젝트는 Java와 Spring Boot 기반으로 개발된 **일정 관리 REST API 서비스**입니다.  
+사용자는 일정을 등록/수정/삭제할 수 있으며, **작성자 정보 관리, 유효성 검증, 예외 처리, 페이징 처리** 등 다양한 기능을 제공합니다.  
+또한, **3 Layer Architecture**와 **DTO 패턴**, **Enum 기반 에러 코드 관리**, **Bean Validation**, **글로벌 예외 처리**를 통해  
+**확장성과 유지보수성**을 갖춘 구조로 설계되었습니다.
 
 ---
 
-## ERD 구조  
-**아래는 DB 구조를 나타내는 ERD(Entity Relationship Diagram)입니다.**  
-![ERD](src/img/DBdiagram.png)
+## 2. 주요 기능
 
-### **테이블 설명**
-| 테이블명 | 설명 |
-|---------|-------------------------|
-| **schedules** | 기본 일정 정보를 저장하는 테이블 |
-| **schedule_history** | 일정이 수정될 때마다 변경 내역을 저장하는 테이블 |
-| **schedule_participants** | 일정에 참여하는 사용자 정보를 저장하는 테이블 |
-| **schedule_notifications** | 일정에 대한 알림 정보를 저장하는 테이블 |
-
----
-
-### **테이블 간 관계**
-1. **`schedules(일정)` ↔ `schedule_history(일정 수정 이력)`** (`1:N`)
-- 일정이 수정될 때마다, `schedule_history`에 이전 데이터가 기록됨.
-
-2. **`schedules(일정)` ↔ `schedule_participants(참여자)`** (`1:N`)
-- 하나의 일정에는 여러 명의 사용자가 참여할 수 있음.
-
-3. **`schedules(일정)` ↔ `schedule_notifications(알림)`** (`1:N`)
-- 하나의 일정에는 여러 개의 알림이 설정될 수 있음.
+- ✅ 일정 등록, 조회(단건/전체), 수정, 삭제
+- ✅ 일정 작성자 정보 분리 (작성자 테이블과 외래키 관계 설정)
+- ✅ 일정 수정 이력 저장 (History 테이블)
+- ✅ 페이징 처리 (`/schedules/paged`)
+- ✅ 비밀번호 기반 수정/삭제
+- ✅ 유효성 검사 및 예외 처리
+- ✅ 에러 코드 통일화 (enum 기반)
+- ✅ RESTful API 명세 제공
 
 ---
 
-## API 명세  
+## 3. 📁 프로젝트 구조
 
-### ✅ **1. 일정 생성 (Create)**
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| `POST` | `/schedules` | 새로운 일정을 생성합니다. |
-
-#### 요청 (Request)
-```json
-{
-  "title": "회의 일정",
-  "description": "주간 회의 진행",
-  "date": "2025-03-20",
-  "time": "10:00:00",
-  "password": "1234"
-}
-```
-#### 응답 (Response)
-```json
-{
-  "id": 1,
-  "title": "회의 일정",
-  "description": "주간 회의 진행",
-  "date": "2025-03-20",
-  "time": "10:00:00",
-  "status": "scheduled",
-  "created_at": "2025-03-19T15:00:00Z"
-}
+```plaintext
+📦 src
+ ┣ 📂 img                         # ERD 이미지 등 정적 리소스
+ ┣ 📂 main
+ ┃ ┣ 📂 java
+ ┃ ┃ ┗ 📂 org.example
+ ┃ ┃   ┣ 📂 config              # 설정 클래스 (예: CORS, JDBC 등)
+ ┃ ┃   ┣ 📂 controller          # REST API 컨트롤러 계층
+ ┃ ┃   ┣ 📂 dto                 # 요청/응답 DTO 클래스
+ ┃ ┃   ┣ 📂 entity              # DB 엔티티 및 enum (ErrorCode 포함)
+ ┃ ┃   ┣ 📂 exception           # 사용자 정의 예외, 예외 핸들러
+ ┃ ┃   ┣ 📂 repository          # 데이터 접근 계층 (JDBC Repository)
+ ┃ ┃   ┣ 📂 service             # 비즈니스 로직 처리 계층
+ ┃ ┃   ┗ 📜 Main.java           # 애플리케이션 시작점 (SpringBootApplication)
+ ┃ ┗ 📂 resources
+ ┃   ┣ 📜 application.properties       # 환경설정 (DB 연결 등)
+ ┃   ┗ 📜 application.properties-copy  # 백업본
+ ┣ 📂 test                     # 테스트 코드 (미작성 or 향후 작성 예정)
+┣ 📜 build.gradle              # 빌드 설정
+┣ 📜 gradlew / gradlew.bat     # Gradle Wrapper 실행 스크립트
+┣ 📜 schedule.sql              # 초기 DB 테이블 생성 SQL
+┣ 📜 README.md                 # 프로젝트 설명 파일
+┗ 📜 .gitignore                # Git 버전 관리 제외 설정
 ```
 
 ---
 
-### ✅ **2. 일정 조회 (Read)**
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| `GET` | `/schedules/{id}` | 특정 일정 정보를 조회합니다. |
+## 4. ⚙️ 기술 스택
 
-#### 응답 (Response)
-```json
-{
-  "id": 1,
-  "title": "회의 일정",
-  "description": "주간 회의 진행",
-  "date": "2025-03-20",
-  "time": "10:00:00",
-  "status": "scheduled",
-  "created_at": "2025-03-19T15:00:00Z"
-}
+| 구분 | 기술 |
+|------|------|
+| Language | Java 17 |
+| Framework | Spring Boot 3.x |
+| DB | MySQL |
+| Build Tool | Gradle |
+| Validation | Hibernate Validator |
+| ORM | JDBC (Spring Data JDBC) |
+| 기타 | Lombok, REST API 기반 설계 |
+
+---
+
+## 5. 실행 방법
+
+### 요구 사항
+
+- Java 17+
+- MySQL 실행 중 (`schedule_db` 데이터베이스 생성 필요)
+- Gradle 설치
+
+### 실행 단계
+
+1. 세팅
+```bash
+# DB 세팅
+mysql -u root -p < schedule.sql
+
+# 애플리케이션 실행
+./gradlew bootRun
+```
+
+이 다음 resources폴더를 만들고 application.properties에 copy본을 넣기
+```bash
+# MySQL
+spring.datasource.url=jdbc:mysql://localhost:3306/schedule_db?serverTimezone=Asia/Seoul
+spring.datasource.username=root
+spring.datasource.password=1q2w3e4r!
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# SQL
+logging.level.org.springframework.jdbc.core=DEBUG
 ```
 
 ---
 
-### ✅ **3. 일정 목록 조회 (List)**
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| `GET` | `/schedules` | 모든 일정 목록을 조회합니다. |
+## 6. API 사용 예시
+ - Postman 사용을 권장!
+### 일정 등록
 
-#### 응답 (Response)
+```http
+POST /schedules
+Content-Type: application/json
+```
+
+#### 요청 바디
 ```json
-[
-  {
-    "id": 1,
-    "title": "회의 일정",
-    "date": "2025-03-20",
-    "time": "10:00:00",
-    "status": "scheduled"
+{
+  "title": "주간 회의",
+  "description": "팀 회의입니다.",
+  "author": {
+    "name": "홍길동",
+    "email": "hong@example.com"
   },
-  {
-    "id": 2,
-    "title": "점심 약속",
-    "date": "2025-03-21",
-    "time": "12:30:00",
-    "status": "scheduled"
-  }
-]
-```
-
----
-
-### ✅ **4. 일정 수정 (Update)**
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| `PUT` | `/schedules/{id}` | 특정 일정을 수정합니다. |
-
-#### 요청 (Request)
-```json
-{
-  "title": "주간 회의",
-  "description": "팀 주간 회의 진행",
   "date": "2025-03-20",
-  "time": "11:00:00",
-  "password": "1234"
+  "time": "10:00:00",
+  "password": "secure123"
 }
 ```
-#### 응답 (Response)
+
+### 유효성 검사 실패 응답
 ```json
 {
-  "id": 1,
-  "title": "주간 회의",
-  "description": "팀 주간 회의 진행",
-  "date": "2025-03-20",
-  "time": "11:00:00",
-  "status": "scheduled",
-  "last_updated_at": "2025-03-19T16:00:00Z"
+  "code": "1003",
+  "message": "title: 제목은 필수입니다., author.email: 이메일 형식이 올바르지 않습니다.",
+  "status": 400
 }
 ```
 
 ---
 
-### ✅ **5. 일정 삭제 (Delete)**
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| `DELETE` | `/schedules/{id}` | 특정 일정을 삭제합니다. |
+## 7. 유효성 검사
 
-#### 요청 (Request)
-```json
-{
-  "password": "1234"
-}
+| 필드 | 검증 어노테이션 | 설명 |
+|------|------------------|------|
+| title | `@NotBlank`, `@Size(max=200)` | 200자 이하 필수 |
+| password | `@NotBlank` | 필수 |
+| author.name | `@NotBlank` | 필수 |
+| author.email | `@Email` | 이메일 형식 |
+
+- Bean Validation 기반
+- `@Valid` + `@ExceptionHandler(MethodArgumentNotValidException.class)` 활용
+
+---
+
+## 8. 예외 처리
+
+### GlobalExceptionHandler를 통한 공통 처리
+
+```md
+## 내부 에러 코드 설명 표
+
+| 코드 | 상태 코드 | 에러 명칭 | 설명 |
+|------|------------|-----------|------|
+| `1001` | 404 Not Found | `SCHEDULE_NOT_FOUND` | 조회한 일정이 존재하지 않을 경우 발생 |
+| `1002` | 403 Forbidden | `PASSWORD_MISMATCH` | 수정/삭제 시 비밀번호가 일치하지 않을 경우 발생 |
+| `1003` | 400 Bad Request | `VALIDATION_ERROR` | 입력값이 유효성 조건을 충족하지 않을 경우 발생 |
+| `1999` | 500 Internal Server Error | `INTERNAL_SERVER_ERROR` | 처리되지 않은 예외 또는 서버 내부 오류 발생 |
 ```
-#### 응답 (Response)
+
+```md
+> ❗️ `code`는 시스템 내부에서 에러의 종류를 구분하기 위한 고유 번호입니다.  
+> ❗️ 프론트엔드 또는 테스트 코드에서 이 `code` 값을 기준으로 분기처리할 수 있습니다.
+```
+
+### 예외 응답 포맷
+
 ```json
 {
-  "message": "일정이 삭제되었습니다."
+  "code": "1002",
+  "message": "비밀번호가 일치하지 않습니다.",
+  "status": 403
 }
 ```
 
 ---
 
-## SQL 테이블 생성 (`schedule.sql`)
-**아래 SQL을 `schedule.sql` 파일에 작성하고 실행하여 데이터베이스 테이블을 생성합니다.**
-```sql
--- 데이터베이스 생성 (없으면 생성)
-CREATE DATABASE IF NOT EXISTS schedule_db;
-USE schedule_db;
+## 9. 객체지향 설계 특징
 
--- 일정 테이블 (기본 일정 정보 저장)
-CREATE TABLE IF NOT EXISTS schedules (
-                                         id INT AUTO_INCREMENT PRIMARY KEY,
-                                         title VARCHAR(255) NOT NULL,
-    description TEXT NULL,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    status ENUM('scheduled', 'ongoing', 'completed', 'canceled') NOT NULL DEFAULT 'scheduled',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    last_updated_at TIMESTAMP NULL
-    );
+| 항목 | 적용 예 |
+|------|---------|
+| 관심사 분리 | Controller / Service / Repository |
+| DTO 패턴 | 요청/응답 분리, 보안 필드 제한 |
+| OCP 원칙 | ErrorCode enum을 통해 메시지 통일화 |
+| Validation 확장성 | 어노테이션 기반 검증 + 커스텀 예외 처리 가능 |
 
--- 일정 수정 이력 테이블 (수정할 때마다 기록) → `schedule_history`로 변경됨
-CREATE TABLE IF NOT EXISTS schedule_history (
-                                                id INT AUTO_INCREMENT PRIMARY KEY,
-                                                schedule_id INT NOT NULL,
-                                                previous_title VARCHAR(255) NOT NULL,
-    previous_description TEXT NULL,
-    previous_date DATE NOT NULL,
-    previous_time TIME NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE
-    );
-
--- 일정 참여자 테이블 (일정에 여러 명이 참여 가능)
-CREATE TABLE IF NOT EXISTS schedule_participants (
-                                                     id INT AUTO_INCREMENT PRIMARY KEY,
-                                                     schedule_id INT NOT NULL,
-                                                     user_name VARCHAR(255) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
-    FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE
-    );
-
--- 일정 알림 테이블 (일정마다 여러 개의 알림 설정 가능)
-CREATE TABLE IF NOT EXISTS schedule_notifications (
-                                                      id INT AUTO_INCREMENT PRIMARY KEY,
-                                                      schedule_id INT NOT NULL,
-                                                      notify_time DATETIME NOT NULL,
-                                                      FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE
-    );
-
-```
 ---
 
-## 이후 추가할 내용 (추후 정리)
-- 프로젝트 실행 방법
-- 기타 기술 스택
+## 10. 트러블슈팅
+
+### ❌ `@Valid` 메시지가 출력되지 않음
+- 해결: `GlobalExceptionHandler`에 `MethodArgumentNotValidException` 처리 추가
+- `error.getDefaultMessage()` 로 DTO의 메시지 추출 후 `ErrorResponse.setMessage(...)`로 대체
+
+---
+
+## 11. 향후 개선 예정
+
+- Swagger 연동을 통한 API 문서 자동화
+- JWT 기반 인증 기능 추가
+- 알림 스케줄링 기능 추가 (`schedule_notifications`)
+- 프론트 연동을 위한 CORS 설정 및 도메인 분리
+
+---
+
+## 12. 📜 라이선스
+
+이 프로젝트는 **MIT License** 하에 자유롭게 사용 가능합니다.
+
+---
+
+## ✅ 작성 블로그
+
+- [Spring_6기_일정_관리_앱 시리즈](https://velog.io/@hyang_do/series/Spring6%EA%B8%B0%EC%9D%BC%EC%A0%95%EA%B4%80%EB%A6%AC%EC%95%B1)
+- [Spring_6기_일정_관리_앱 트러블 슈팅 시리즈](https://velog.io/@hyang_do/series/Spring6%EA%B8%B0%EC%9D%BC%EC%A0%95%EA%B4%80%EB%A6%AC%EC%95%B1%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85)
+
